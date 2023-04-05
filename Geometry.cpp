@@ -20,7 +20,7 @@ bool isInAngle(pt a,pt b,pt c,pt p) {
 bool isConvex(vector<pt>&p) {
     bool pos = false, neg = false;
     for (int i = 0, n = sz(p); i < n; i++) {
-        int o = orient(p[(i + 1) % n], p[i], p[(i + 2) % n]);
+        int o = orient(p[(i + 1) % n], p[i], p[(i + 2)%n]);
         if (o > 0) pos = true;if (o < 0) neg = true;
     }return !(pos && neg);}
 bool half(pt p) {
@@ -31,8 +31,7 @@ bool half(pt p) {
 void polarSort(vector<pt>&v) {
     sort(v.begin(), v.end(), [](pt a, pt b) {
         return make_tuple(half(a), 0) < make_tuple(half(b), cross(a, b));
-    });
-}
+    });}
 struct line {
     pt v;T c; //parallel to line  // from ax+by=x
     //so our equation of line is cross(v,xi+yj)=c
@@ -62,12 +61,9 @@ line bisector(line l1, line l2, bool interior) {
     assert(cross(l1.v, l2.v) != 0); // l1 and l2 should not be parallel
     double sign = interior ? 1 : -1;
     return {l2.v / abs(l2.v) + l1.v / abs(l1.v) * sign,
-            T(l2.c / abs(l2.v) + l1.c / abs(l1.v) * sign)};
-}
+            T(l2.c / abs(l2.v) + l1.c / abs(l1.v) * sign)};}
 // p in disk with a,b as diameter
-bool inDisk(pt a,pt b,pt p) {
-    return dot(a - p, b - p) <= 0;
-}
+bool inDisk(pt a,pt b,pt p) {return dot(a - p, b - p) <=0;}
 // to check if point p lie on segment [a,b]
 // orient(a, b, p) == 0 && inDisk(a, b, p);
 //if segment [a,b], [c,d] intersection properly(~endpoints)
@@ -76,10 +72,7 @@ bool properInter(pt a,pt b,pt c,pt d,pt &out) {
     ld oc = orient(a, b, c), od = orient(a, b, d);
     if (oa * ob < 0 && oc * od < 0) {
         out = (a * ob - b * oa) / (ob - oa);
-        return true;
-    }
-    return false;
-}
+        return true;}return false;}
 //To create sets of points
 struct cmp {
     bool operator()(pt a, pt b) {
