@@ -129,13 +129,6 @@ ld areaTriangle(pt a,pt b,pt c) {
 }
 // counterclockwise order,if in clockwise order
 // area is negative for both concave and convex
-ld areaPolygon(vector<pt>&p) {
-    ld area = 0.0;
-    for (int i = 0, n = p.size(); i < n; i++) {
-        area += cross(p[i], p[(i + 1) % n]);
-    }
-    return abs(area) / 2.0;
-}
 int areaPolygonTw(vector<pt>&p) {
     int area = 0;
     for (int i = 0, n = p.size(); i < n; i++) {
@@ -169,118 +162,12 @@ bool inPolygon(vector<pt>&v,pt a,bool strict=true) {
     }
     return numCrossings&1;
 }
-// returns how many times we go anticlockwise around a, following
-// polyline, (a should not lie on polyline)
-// if point is outside polygon, winding number is zero
-int windingNumberFloat(vector<pt> &p,pt a) {
-    ld ampli = 0;
-    for (int i = 0, n = p.size(); i < n; i++) {
-        ampli += angleTravelled(a, p[i], p[(i + 1) % n]);
-    }
-    return round(ampli / (2 * PI));
-}
-struct ang {
-    pt d; // angle is atan2(d)+2*PI*t
-    int t = 0; //turns
-    ang(pt _d, int _t = 0):d(_d),t(_t){}
-    friend bool operator<(ang a, ang b) {
-        return make_tuple(a.t, half(a.d), 0) <
-               make_tuple(b.t, half(b.d), cross(a.d, b.d));
-    }
-    ang t180() { return {d * (-1), t + half(d)};}
-    ang t360() { return {d, t + 1};}
-    ang moveTo(ang a, pt newD) {
-        assert(!onSegment(a.d, newD, {0, 0}));
-        ang b{newD, a.t};
-        if (a.t180() < b) b.t--;
-        if (b.t180() < a) b.t++;
-        return b;
-    }
-};
-//assumes point doesnt lie on polygon
-int windingNumberInt(vector<pt>p,pt o) {
-    for (auto &c: p) c -= o;
-    ang g = ang(p.back());
-    for (auto &d: p) {g = g.moveTo(g, d);}
-    return g.t;
-}
-pt circumCenter(pt a,pt b,pt c) {
-    b = b - a, c = c - a;
-    assert(cross(b, c) != 0);
-    return a + prep(b * sq(c) - c * sq(b)) / cross(b, c) / 2;
-}
-int circleLine(pt o,ld r,line l,pair<pt,pt>&out) {
-    ld h2 = r * r - l.sqDist(o);
-    if (h2 >= 0) {
-        pt p = l.proj(o);
-        pt h = l.v * sqrt(h2) / abs(l.v);
-        out = {p - h, p + h};
-    }
-    return 1 + sgn(h2);
-}
-int circleCircle(pt o1,ld r1,pt o2,ld r2,pair<pt,pt>&out) {
-    pt d = o2 - o1;
-    ld d2 = sq(d);
-    if (d2 == 0) {
-        assert(r1 != r2);
-        return 0; //concentric circle;
-    }
-    ld pd = (d2 - r1 * r1 - r2 * r2) / 2.0;
-    ld h2 = r1 * r1 - pd * pd / d2;
-    if (h2 >= 0) {
-        pt p = o1 + d * pd / d2;
-        pt h = prep(d) * sqrt(h2) / sqrt(d2);
-        out = {p - h, p + h};
-    }
-    return 1 + sgn(h2);
-}
-int tangents(pt o1, double r1, pt o2, double r2, bool inner, vector<pair<pt,pt>> &out) {
-    if (inner) r2 = -r2;
-    pt d = o2 - o1;
-    ld dr = r1 - r2, d2 = sq(d), h2 = d2 - dr * dr;
-    if (d2 == 0 || h2 < 0) {
-        assert(h2 != 0);
-        return 0;
-    }
-    for (ld sign: {-1, 1}) {
-        pt v = (d * dr + prep(d) * sqrt(h2) * sign) / d2;
-        out.push_back({o1 + v * r1, o2 + v * r2});
-    }
-    return 1 + (h2 > 0);
-}
 // reorder by first element being left bottom point
 void reorder(vector<pt>&a){
     int pos=0;
     for(int i=1;i<a.size();i++)
         if(a[i].x<a[pos].x || (a[i].x==a[pos].x && a[i].y<a[pos].y))pos=i;
     rotate(a.begin(),a.begin()+pos,a.end());
-}
-//inputs points are sorted in counterclockwise order
-vector<pt> minkowskiSum(vector<pt>a,vector<pt>b) {
-    reorder(a);
-    reorder(b);
-    vector<pt> ans;
-    int i = 0, j = 0;
-    int n = sz(a), m = sz(b);
-    int times = n + m;
-    while (times--) {
-        ans.push_back(a[i] + b[j]);
-        if (cross(a[(i + 1) % n] - a[i], b[(j + 1) % m] - b[j]) >= 0) {
-            i++;
-            i %= n;
-        } else {
-            j++;
-            j %= m;
-        }
-    }
-    // remove redundant points
-    vector<pt> r_ans;
-    for (int l = 0; l < n + m; l++) {
-        if (orient(ans[(l - 1 + n + m) % (n + m)], ans[l], ans[(l + 1) % (n + m)]) != 0) {
-            r_ans.push_back(ans[l]);
-        }
-    }
-    return r_ans;
 }
 // lattice points in a polygon strictly inside, s=i+b/2-1
 pair<int,int> latticePoints(vector<pt>&p) {
