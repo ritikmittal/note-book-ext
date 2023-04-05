@@ -1,4 +1,4 @@
-// Suffix Array
+//!!! Suffix Array
 struct sufar{
     string s;
     vector<int>lcp,order,rank;
@@ -58,7 +58,7 @@ struct sufar{
             else{r=mid;}
         }
 
-// LR Flow
+//!!! LR Flow
 const int N = 3e5 + 9;
 const long long inf = 1LL << 61;
 struct Dinic {
@@ -74,3 +74,24 @@ struct Dinic {
   Dinic(int _n) {
     n = _n + 10; mxid = 0; g.resize(n);}
   void add_edge(int u, int v, long long w, int id = -1) {
+      
+//!!!multiplicative linear sieve
+  void sieve (int n) {
+std::fill (is_composite, is_composite + n, false);
+phi[1] = 1;mu[1]=1;spf[1]=1;cnt[1]=0;
+for (int i = 2; i < n; ++i) {
+    if (!is_composite[i]) {
+        prime.push_back (i);phi[i] = i - 1;mu[i]=-1;
+        spf[i]=i;cnt[i]=1;
+    }
+    for (int j = 0; j < prime.size () && i * prime[j] < n; ++j) {
+        is_composite[i * prime[j]] = true;
+        spf[i*prime[j]]=prime[j];
+        if (i % prime[j] == 0) {
+            phi[i * prime[j]] = phi[i] * prime[j];	//prime[j] divides i
+            mu[i * prime[j]] = 0;cnt[i * prime[j]] = cnt[i] + 1;
+            break;
+        } else {
+            phi[i * prime[j]] = phi[i] * phi[prime[j]];	//prime[j] does not divide i
+            mu[i * prime[j]] = mu[i] * mu[prime[j]];cnt[i * prime[j]] = 1;
+        }}}}
