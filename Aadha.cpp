@@ -67,8 +67,7 @@ struct Dinic {
     long long flow, w;
     int id; };
   int n, s, t, mxid;
-  vector<int> d, flow_through;
-  vector<int> done;
+  vector<int> d, flow_through,done;
   vector<vector<edge>> g;
   Dinic() {}
   Dinic(int _n) {

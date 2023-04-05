@@ -121,8 +121,8 @@ T query(T x) {
 void FST(vll& a, bool inv) {
 for (ll n = sz(a), step = 1; step < n; step *= 2) {
     for (ll i = 0; i < n; i += 2 * step) for(ll j=i;j<i+step;j++) {
-        ll &u = a[j], &v = a[j + step]; tie(u, v) =
-                                                    inv ? pll(v - u, u) : pll(v, u + v); // AND
+        ll &u = a[j], &v = a[j + step];
+         tie(u, v) =inv ? pll(v - u, u) : pll(v, u + v); // AND
         // inv ? pll(v, u - v) : pll(u + v, u); // OR /// include-line
         // pll(u + v, u - v);                   // XOR /// include-line
     }
