@@ -1,4 +1,3 @@
-DINIC : 
 const int N = 3e5 + 9;
 const long long inf = 1LL << 61;
 struct Dinic {
